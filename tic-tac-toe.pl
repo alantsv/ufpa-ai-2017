@@ -171,6 +171,7 @@ nl, tab(7),wrtLinha(1,2,3,T), tab(7),write('------'),nl,
 EXERCICIOS PRÁTICOS 
 1) qual a diferença de sort(1,<,X,Y), para sort(2,>,X,Y), mostre
 consultando por ex. sort(1,<,[2-a,5-b,1-c,4-d,11-e],L).
+
 O sort/4 tem como primeiro parametro o indice pelo qual será ordenado a lista
 e o segundo determida a ordenação acesdente ou descendente. Sendo assim, 
 o sort(1,<,X,Y), ordena a lista X pelo primeiro indice do menor para 
@@ -182,6 +183,7 @@ L = [1-c, 2-a, 4-d, 5-b, 11-e]
 L = [11-e, 4-d, 1-c, 5-b, 2-a]
 
 2) mostre T onde vence(T,o) é true
+
 ?- vence([o,o,o],o).
 true
 
@@ -201,6 +203,21 @@ Tab = [o, x, o, x, x, o, b, o, x]
 Tab = [o, o, b, x, x, b, b, b, b]
 
 6) mostre todos os movimentos para cruz no Tab=[b,o,x, b,b,b, b,b,b]?
+?- Tab=[b,o,x, b,b,b, b,b,b], move([x, play,Tab],X). 
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [x, o, x, b, b, b, b, b, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, x, b, b, b, b, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, b, x, b, b, b, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, b, b, x, b, b, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, b, b, b, x, b, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, b, b, b, b, x, b]]
+Tab = [b, o, x, b, b, b, b, b, b],
+X = [o, play, [b, o, x, b, b, b, b, b, x]]
 
 
 7) dado o Tab=[b,o,x, b,b,b, b,b,b], nextState retorna oque?
