@@ -1,4 +1,4 @@
-%%
+%% Algoritmo Genético Elitista
 % parameterização
 
 geracoes(30). %% 100 
@@ -7,13 +7,16 @@ populacaoCruza(18). %% para versão elitista
 prob_cruza(0.7).
 prob_mutacao(0.30). 
 num_bits(38).  %% comossomo 
-gene_bits(19). %% num_bits/2
+gene_bits(19). %% num_bits/2, pois está trabalhando com 2 genes
 %
-f8(X,Y):-format(atom(Y),'~3f|', X). % ponto futuante 
+
+% determina o formato de escrita dos valores.
+f8(X,Y):-format(atom(Y),'~3f|', X). % ponto futuante
 fx(X,Y):-format(atom(Y),'~16R', X). % hexadecimal 
-f2(X,Y):-format(atom(Y),'~2R', X). % hexadecimal 
+f2(X,Y):-format(atom(Y),'~2R', X). % binário
 %%
 
+%% funções de teste
 %% f(x) = x* sen(30.141516*x)+1, x={0..25}
 %% f(x,y)=0.5 - ([sin(sqrt(x^2+y^2))]^2-0.5)/([1+0,001(x^2+y^2)]^2)
 %% f(X,Y,Z):- Z is 0.5 - ((sin(sqrt(X^2+Y^2)))^2-0.5)/((1+0.001*(X^2+Y^2))^2).
@@ -21,34 +24,37 @@ f2(X,Y):-format(atom(Y),'~2R', X). % hexadecimal
 f(X,Y,Z):- Z is X*X*Y.
 %% f(X,Y,Z):- Z is X*sin(X*10*3.141516)+1.
 %%
-%% ?- X is (2^19-1)/1000,X=Y, f(X,Y,Z).
-%% ?- X is 2^19-1, f2(X,Y). 
+%% ?- X is (2^19-1)/1000,X=Y, f(X,Y,Z).  % 2^19-1, faz parte da transformação para decimal.
+%% ?- X is 2^19-1, f2(X,Y).
 %% ?- X is 2^19-1, f2(X,Y).
 %% X = 524287, Y = '1111111111111111111'. 
 %%
 geraHum(C):- num_bits(N),lista_rand(C,2,N).
-lista_rand( [],V,N):-N<1,!.
+lista_rand( [],V,N):-N<1,!. % gera uma lista randomica, com N valores.
 lista_rand([R|L],V,N):-N1 is N-1, R is random(V), lista_rand(L,V,N1).
-random(X,N):- X is random(N)+1.
+random(X,N):- X is random(N)+1. % modificado a função random para começar no 1.
 rand(N,R):- R is random(65000)/64999*N.
 %%	
 
 %% Algoritmo genetico
+% escreve a população
 wPop(X):-var(X),!.
 wPop([X|Xs]):-!,wInd(X),wPop(Xs). 
 wPop([]):-nl,!.
+% escreve o individuo
 wInd(V-X):-!,f8(V,V8),write(V8),write(' '),wInd(X). 
 wInd(X):-get2dec(X,A,B), wcromo(A,B),nl.		 
 wInd(X):-write(X),nl. 	
+% escreve o cromossomo
 wcromo(X,Y) :- f8(X,X1),f8(Y,Y1),write(X1:Y1).
 %%wcromo(X,Y) :- fx(X,X1),fx(Y,Y1),write(X1:Y1).		 
 %%
 %%
 gera:- 
-    populacao(NP),
-    findall(C,(between(1,NP,_),geraHum(C)),Pop),
-	wPop(Pop), 
-	avalia_roleta(Pop,PopAv),
+    populacao(NP), % podendo usar a população com 3 ou 4, depois aumenta
+    findall(C,(between(1,NP,_),geraHum(C)),Pop), % gera a população
+	wPop(Pop), % escreve a população
+	avalia_roleta(Pop,PopAv), % método da roleta
 	geracoes(NG),
 	gera_geracao(0/NG,PopAv/PopAv1),!.
 		
@@ -129,7 +135,7 @@ zipper([X|Xs],[Y|Ys],[X-Y|XYs]):- !,zipper(Xs,Ys,XYs).
 zipper([],[],[]).
 div(X,Y,YX):-YX is Y/X.
 %% ?- maplist(div(2),[1,2,3],X). 
-limpa(L,Lp):- zipper(_,Lp,L).
+limpa(L,Lp):- zipper(_,Lp,L). % fica só com a população e elimina a avaliação
 %% ?- limpa([1-a,2-b,3-c],L).
 		
 %% Operador de crossover 
@@ -139,15 +145,16 @@ cruza1(N,P,Acc/Po):-
         roda_roleta(P,I1),roda_roleta(P,I2),
 	    pontos_cruza(P1,P2),
 	    prob_cruza(Pcruz), rand(1,Pc),
+    	% se a probabilidade for menor passa o próprio indivíduos
 	   ((Pc =< Pcruz -> cruzar(I1,I2,P1,P2,NI1),
 	                    cruzar(I2,I1,P1,P2,NI2))
 		;(NI1=I1,NI2=I2)),
 	    addList(NI1,Acc/Acc1),addList(NI2,Acc1/Acc2),
 	    cruza1(N,P,Acc2/Po),!.
-addList(X,L/Lo):- member(X,L),!,Lo=L;Lo=[X|L].	
+addList(X,L/Lo):- member(X,L),!,Lo=L;Lo=[X|L].	% teste para não adicionar indivídous duplicados
 %%    
 %% ROLETA: usa soma cumulativa  		   
-roda_roleta(Pop,I):- rand(1,X), getPop(X,Pop,I).
+roda_roleta(Pop,I):- rand(1,X), getPop(X,Pop,I). % tira dois individuos pelo método da roleta
 getPop(X,[V-I|VIs],I):- X=<V,!.
 getPop(X,[V-I|VIs],Io):- Xi is X-V, getPop(Xi,VIs,Io).
 getPop(X,[],_):-write(roleta_falhou). 
