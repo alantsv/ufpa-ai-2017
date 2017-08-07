@@ -10,10 +10,10 @@ import random
 # Variáveis Globais 
 #
 
-OPTIMAL     = "Hello world"
+OPTIMAL     = "Hello World"
 DNA_SIZE    = len(OPTIMAL)
 POP_SIZE    = 200
-GENERATIONS = 1000
+GENERATIONS = 10000
 mutation_chance = 100 # 1/mutation_chance
 crossover_chance= 6 # 1/...
 
@@ -21,9 +21,10 @@ crossover_chance= 6 # 1/...
 def save_elite (items):
   fst_elite_ind, smaller_weight = items[0]
   for item, weight in items:
-    if smaller_weight >= weight:
+    if smaller_weight <= weight:
       smaller_weight = weight
       snd_elite_ind, fst_elite_ind = fst_elite_ind, item
+  print ("Elite", fst_elite_ind)
   return fst_elite_ind, snd_elite_ind
 
 def weighted_choice(items):
