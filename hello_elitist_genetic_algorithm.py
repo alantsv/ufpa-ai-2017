@@ -5,6 +5,7 @@ Copyright (c) 2011 Colin Drake
 """
 
 import random
+from operator import itemgetter
 
 #
 # Variáveis Globais 
@@ -19,13 +20,11 @@ crossover_chance= 6 # 1/...
 
 # Salva os dois melhores
 def save_elite (items):
-  fst_elite_ind, smaller_weight = items[0]
-  for item, weight in items:
-    if smaller_weight <= weight:
-      smaller_weight = weight
-      snd_elite_ind, fst_elite_ind = fst_elite_ind, item
-  print ("Elite", fst_elite_ind)
-  return fst_elite_ind, snd_elite_ind
+  items_copy = items
+  items_copy.sort(key=itemgetter(1), reverse=True)
+  e_ind1 = items_copy[0]
+  e_ind2 = items_copy[1]
+  return e_ind1, e_ind2
 
 def weighted_choice(items):
   # items = Pop = [(ind1, peso1), (ind2, peso2)..]
@@ -94,13 +93,11 @@ def main():
       pair = (individual, fitness_val)
       w_population.append(pair)
 
-    # salva dois melhores  
-    fst_elite_ind, snd_elite_ind = save_elite(w_population)
-    
-    from operator import itemgetter
+    # salva dois melhores  main()
+    e_ind1, e_ind2 = save_elite(w_population)
 
     population = []
-    for _ in range(int(POP_SIZE/2)):
+    for _ in range(int(POP_SIZE/2)-1):
       # Selection
       ind1 = weighted_choice(w_population)
       ind2 = weighted_choice(w_population)
@@ -113,8 +110,9 @@ def main():
       population.append(mutate(ind1))
       population.append(mutate(ind2))
     
-    # Adiciona o dois melhores a lista
-    population = population[:-2] + [fst_elite_ind] + [snd_elite_ind]
+    # Adiciona o dois melhores no final da lista sem os pesos
+    population.append(e_ind1[0])
+    population.append(e_ind2[0])
     
     # pega a população e ordena para testar o ótimo  
     wp=w_population
