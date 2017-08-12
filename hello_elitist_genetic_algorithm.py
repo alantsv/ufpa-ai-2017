@@ -6,6 +6,7 @@ Copyright (c) 2011 Colin Drake
 
 import random
 from operator import itemgetter
+file = open('data', 'w')
 
 #
 # Variáveis Globais 
@@ -14,7 +15,7 @@ from operator import itemgetter
 OPTIMAL     = "Hello World"
 DNA_SIZE    = len(OPTIMAL)
 POP_SIZE    = 200
-GENERATIONS = 10000
+GENERATIONS = 1000
 mutation_chance = 100 # 1/mutation_chance
 crossover_chance= 6 # 1/...
 
@@ -118,7 +119,9 @@ def main():
     wp=w_population
     wp.sort(key=itemgetter(1), reverse=True)
     wp0=wp[0]
-    #print(wp0[0],wp0[1])
+
+    file.write(str(wp0[1]) + "\n")
+
 
     # se encontra a meta sai 
     if wp0[1]== 1:
@@ -129,6 +132,7 @@ def main():
   wp.sort(key=itemgetter(1), reverse=True)
   wp0=wp[0]
   print ("O melhor ainda não ótimo:", wp0[0],wp0[1])
+  file.close()
   exit(0)
 
 #
@@ -138,5 +142,3 @@ def main():
 if __name__ == "__main__":
   main()
   exit(0)
-  
-  
